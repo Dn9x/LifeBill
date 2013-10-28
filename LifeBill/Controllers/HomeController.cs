@@ -165,7 +165,84 @@ namespace LifeBill.Controllers
         [HttpGet]
         public ActionResult Upd()
         {
+            int mid = Convert.ToInt32(Request["i"]);
+
+            IBill iBill = new BillServices();
+
+            DataTable tags = iBill.SelectTagListByIsShow("Y");
+
+            DataTable dets = iBill.SelectDetailByMasterId(mid);
+
+            ViewBag.Tags = tags;
+
+            ViewBag.Details = dets;
+
             return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult Upd(FormCollection form)
+        {
+            int mid = Convert.ToInt32(Convert.ToInt32(form["id"])); 
+            
+            string[] type = form["type"].Split(',');
+            string[] price = form["price"].Split(',');
+            string[] notes = form["notes"].Split(',');
+
+            List<string> list = new List<string>();
+
+            IBill iBill = new BillServices();
+
+            //获取入账的类型
+            DataTable tags = iBill.SelectTagByType("I");
+
+            int revenue = 0;        //入账
+            int outlay = 0;         //出账
+
+            for (int i = 0; i < type.Length; i++)
+            {
+                int temp = 0;
+
+                for (int j = 0; j < tags.Rows.Count; j++)
+                {
+                    if (type[i] == tags.Rows[j]["id"].ToString())
+                    {
+                        revenue += Convert.ToInt32(price[i]);
+                        temp = 0;
+                        break;
+                    }
+                    else
+                    {
+                        temp = Convert.ToInt32(price[i]);
+                    }
+                }
+
+                outlay += temp;
+            }
+
+            //拼接主档SQL
+            string sql = String.Format("update billmaster set revenue={0}, outlay={1}, addtime=now() where id={2}", revenue, outlay, mid);
+
+            list.Add(sql);
+
+            //删除明细档
+            sql = String.Format("delete from billdetail where masterid={0} ", mid);
+
+            list.Add(sql);
+
+            //拼接明细档
+            for (int i = 0; i < type.Length; i++)
+            {
+                sql = String.Format("insert into billdetail(masterid, tagid, price, notes, addtime) " +
+                                "values({0}, {1}, {2}, '{3}', now())", mid, type[i], price[i], notes[i]);
+
+                list.Add(sql);
+            }
+
+            iBill.InsertBill(list);
+
+            return RedirectToAction("About");
         }
 
         public ActionResult About()

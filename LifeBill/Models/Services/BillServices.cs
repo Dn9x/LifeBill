@@ -70,7 +70,11 @@ namespace LifeBill.Models.Services
 
         public DataTable SelectDetailByMasterId(int mid)
         {
-            throw new NotImplementedException();
+            string sql = String.Format("select id, masterid, tagid, price, notes, addtime from billdetail where masterid={0}", mid);
+
+            DataTable dt = this.GetDataSet(conn, CommandType.Text, sql).Tables[0];
+
+            return dt;
         }
 
         public DataTable SelectDetailByTagId(int tid)
@@ -85,11 +89,5 @@ namespace LifeBill.Models.Services
 
         #endregion
 
-        #region IBill 成员
-
-
-        
-
-        #endregion
     }
 }

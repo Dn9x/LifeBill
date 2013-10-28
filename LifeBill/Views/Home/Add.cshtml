@@ -31,7 +31,7 @@
                 <td align="center">
                     <input type="text" style="width:100px;" class="price" name="price" />
                 </td>
-                <td align="center"><textarea name="notes" style="width:500px; height:70px;" ></textarea></td>
+                <td align="center"><textarea name="notes" id="notes" style="width:500px; height:70px;" ></textarea></td>
                 <td align="center">
                     <img src="@Url.Content("~/Content/Images/expand.gif")" style="cursor:pointer;" class="Add" alt="添加" title="添加"  />
                     <img src="@Url.Content("~/Content/Images/shrink.gif")" style="cursor:pointer;" class="Sha" alt="删除" title="删除"  />
@@ -66,8 +66,14 @@
             }
         });
 
+        $("#notes").blur(function () {
+            var val = $(this).val().replace(/,/g, ";");
+
+            $(this).val(val);
+        });
+
         $(".Add").click(function () {
-            var tr = $(this).parent().parent().clone();
+            var tr = $(this).parent().parent().clone(true);
 
             $("tbody").append(tr);
         });
