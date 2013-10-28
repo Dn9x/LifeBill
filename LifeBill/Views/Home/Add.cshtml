@@ -1,0 +1,79 @@
+﻿@using System.Data
+@{
+    ViewBag.Title = "Add";
+}
+
+<div style="margin:10px auto; border:1px solid #ccc; width:90%; min-width:812px; height:auto;">
+<form action="/Home/Add" method="post">
+    <table style="width:100%" cellspacing="0">
+        <thead>
+            <tr>
+                <th>类型</th>
+                <th>金额</th>
+                <th>明细</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td align="center">
+                    <select name="type">
+                        @{
+                            DataTable dt = ViewBag.Tags as DataTable;
+
+                            for (int i = 0; i < dt.Rows.Count;i++ )
+                            {
+                                <option value="@dt.Rows[i]["id"].ToString()">@dt.Rows[i]["tagname"].ToString()</option>
+                            }
+                         }
+                    </select>
+                </td>
+                <td align="center">
+                    <input type="text" style="width:100px;" class="price" name="price" />
+                </td>
+                <td align="center"><textarea name="notes" style="width:500px; height:70px;" ></textarea></td>
+                <td align="center">
+                    <img src="@Url.Content("~/Content/Images/expand.gif")" style="cursor:pointer;" class="Add" alt="添加" title="添加"  />
+                    <img src="@Url.Content("~/Content/Images/shrink.gif")" style="cursor:pointer;" class="Sha" alt="删除" title="删除"  />
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td align="center" colspan="4">
+                    <input type="hidden" id="year" name="year" />
+                    <input type="hidden" id="month" name="month" />
+                    <input type="hidden" id="day" name="day" />
+                    <input type="submit" value="保存" />
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</form>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("#year").val(getUrlPara("y"));
+        $("#month").val(getUrlPara("m"));
+        $("#day").val(getUrlPara("d"));
+
+        $("input[class='price']").blur(function () {
+            var patrn = /^([1-9]\d*|0)(\.\d+)?$/;
+            if (!patrn.exec($(this).val())) {
+                $(this).val("只能输入数字").css("color", "red");
+                return false;
+            }
+        });
+
+        $(".Add").click(function () {
+            var tr = $(this).parent().parent().clone();
+
+            $("tbody").append(tr);
+        });
+
+        $(".Sha").click(function () {
+            $(this).parent().parent().remove();
+        });
+    });
+</script>

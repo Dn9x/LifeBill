@@ -1,0 +1,19 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Lay.cshtml";
+}
+
+<div id="logo">
+    Life Accounting
+</div>
+<div id="font">
+    ---家庭账单
+</div>
+
+<div id="login">
+<form action="@Url.Content("~/Home/Login")" method="post" onsubmit="return check();">
+    <input type="text" class="text" name="name" />&nbsp;
+    <input type="password" class="text" name="pswd" />&nbsp;
+    <input type="submit" value="登录" class="button" />
+</form>
+</div>

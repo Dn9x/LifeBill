@@ -1,0 +1,14 @@
+E:\StudySpace\GitHub\LifeBill\LifeBill\bin\LifeBill.dll
+E:\StudySpace\GitHub\LifeBill\LifeBill\bin\LifeBill.pdb
+E:\StudySpace\GitHub\LifeBill\LifeBill\bin\EntityFramework.dll
+E:\StudySpace\GitHub\LifeBill\LifeBill\bin\EntityFramework.xml
+E:\StudySpace\GitHub\LifeBill\LifeBill\obj\Debug\ResolveAssemblyReference.cache
+E:\StudySpace\GitHub\LifeBill\LifeBill\obj\Debug\LifeBill.dll
+E:\StudySpace\GitHub\LifeBill\LifeBill\obj\Debug\LifeBill.pdb
+F:\LifeBill\LifeBill\bin\LifeBill.dll
+F:\LifeBill\LifeBill\bin\LifeBill.pdb
+F:\LifeBill\LifeBill\bin\EntityFramework.dll
+F:\LifeBill\LifeBill\bin\EntityFramework.xml
+F:\LifeBill\LifeBill\obj\Debug\ResolveAssemblyReference.cache
+F:\LifeBill\LifeBill\obj\Debug\LifeBill.dll
+F:\LifeBill\LifeBill\obj\Debug\LifeBill.pdb

@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "About Us";
+}
+
+    <script src="@Url.Content("~/Scripts/jquery-1.9.1.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/rili.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        $(function () {
+            //            var date = new Date();
+            //            $.post(
+            //				"/Home/GetJson",
+            //				{ "y": date.getFullYear(), "m": date.getMonth()+1 },
+            //				function (json, textStatus) {
+            //				    if (textStatus = "success") {
+            //                        var dats = eval('(' + json + ')');
+
+            //                        $("#Cont").showrili({ data: dats });
+            //				    }
+            //				}
+            //			);
+
+            $("#main").showrili({url: "/Home/GetJson"});
+        });
+
+        function Up(y, m) {
+            $("#main").showrili({ year: y, month: m, url: "/Home/GetJson" });
+        }
+
+        function Jump(url) {
+            alert(url);
+            window.location = "/Home/" + url;
+        }
+
+	</script>
