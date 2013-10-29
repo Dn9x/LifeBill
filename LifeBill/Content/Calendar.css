@@ -51,3 +51,50 @@
 	color:#696969;
 	text-decoration:none;
 }
+
+#Chose_Field table
+{
+	width:90%;
+}
+
+#Chose_Field table td:hover
+{
+	background-color:#ffffff;
+}
+
+#Chose_Field table a
+{
+	color:#0368a8;
+	padding:2px 6px;
+}
+
+#Chose_Field table a:hover
+{
+	padding:2px 6px;
+	color:#ffffff;
+	cursor:pointer;
+	background-color:#f60;
+}
+
+.chose_add_a
+{
+	background-color:#f60;
+}
+
+#Chose_Field  #td_res a
+{
+	padding:2px 6px;
+	cursor:pointer;
+	color:#333333;
+	background-color:#ffffff;
+	border:1px solid #f60;
+}
+
+#Chose_Field  #td_res a:hover
+{
+	padding:2px 6px;
+	cursor:pointer;
+	color:#333333;
+	background-color:#ffffff;
+	border:1px solid #5319e7;
+}

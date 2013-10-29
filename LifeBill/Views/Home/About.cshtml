@@ -2,34 +2,62 @@
     ViewBag.Title = "About Us";
 }
 
-    <script src="@Url.Content("~/Scripts/jquery-1.9.1.min.js")" type="text/javascript"></script>
-    <script src="@Url.Content("~/Scripts/rili.js")" type="text/javascript"></script>
-    <script type="text/javascript">
+@Html.Partial("_Chose")
 
-        $(function () {
-            //            var date = new Date();
-            //            $.post(
-            //				"/Home/GetJson",
-            //				{ "y": date.getFullYear(), "m": date.getMonth()+1 },
-            //				function (json, textStatus) {
-            //				    if (textStatus = "success") {
-            //                        var dats = eval('(' + json + ')');
+<div id="container" style="min-width: 800px; height: 600px; margin: 0px auto"></div>
 
-            //                        $("#Cont").showrili({ data: dats });
-            //				    }
-            //				}
-            //			);
+<script type="text/javascript">
 
-            $("#main").showrili({url: "/Home/GetJson"});
-        });
+    function ShowT() {
+        $.post(
+			"/Home/GetMap",
+			{ "y": $("#Hid_Year").val(), "m": $("#Hid_Month").val() },
+			function (json, textStatus) {
+			    if (textStatus = "success") {
+			        var r1 = json.substring(0, json.indexOf("~*~"));
 
-        function Up(y, m) {
-            $("#main").showrili({ year: y, month: m, url: "/Home/GetJson" });
-        }
+			        var r2 = json.substring(json.indexOf("~*~") + 3, json.lastIndexOf("~*~"));
 
-        function Jump(url) {
-            alert(url);
-            window.location = "/Home/" + url;
-        }
+			        var r3 = json.substring(json.lastIndexOf("~*~") + 3, json.length);
 
-	</script>
+			        $('#container').highcharts({
+			            chart: {
+			                type: $("#Hid_Type").val()
+			            },
+			            title: {
+			                text: 'Life Accounting',
+			                x: -20 //center
+			            },
+			            subtitle: {
+			                text: $("#Hid_Month").val() + '月账单',
+			                x: -20
+			            },
+			            xAxis: {
+			                categories: eval('(' + r1 + ')')
+			            },
+			            yAxis: {
+			                title: {
+			                    text: 'RMB (￥)'
+			                },
+			                plotLines: [{
+			                    value: 10,
+			                    width: 1,
+			                    color: '#808080'
+			                }]
+			            },
+			            tooltip: {
+			                valueSuffix: '￥'
+			            },
+			            legend: {
+			                layout: 'vertical',
+			                align: 'right',
+			                verticalAlign: 'middle',
+			                borderWidth: 0
+			            },
+			            series: [eval('(' + r2 + ')'), eval('(' + r3 + ')')]
+			        });
+			    }
+			}
+		 );
+    }
+</script>

@@ -87,6 +87,15 @@ namespace LifeBill.Models.Interface
         /// <returns></returns>
         string InsertBill(List<string> sqls);
 
+        /// <summary>
+        /// 根据sql查询账单信息
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        DataTable SelectBillBySql(string sql);
+
+
+
 
     }
 }

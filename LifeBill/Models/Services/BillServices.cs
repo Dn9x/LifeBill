@@ -18,7 +18,7 @@ namespace LifeBill.Models.Services
 
         public DataTable SelectMasterByDate(int year, int month)
         {
-            string sql = String.Format("select Concat(years, months, days) as date, CONCAT(outlay, '/', revenue) as total, id from billmaster where years={0} and months={1}", year, month);
+            string sql = String.Format("select Concat(years, months, days) as date, CONCAT('-', outlay, '/', '+', revenue) as total, id from billmaster where years={0} and months={1}", year, month);
 
             DataTable dt = this.GetDataSet(conn, CommandType.Text, sql).Tables[0];
 
@@ -89,5 +89,17 @@ namespace LifeBill.Models.Services
 
         #endregion
 
+
+        #region IBill 成员
+
+
+        public DataTable SelectBillBySql(string sql)
+        {
+            DataTable dt = this.GetDataSet(conn, CommandType.Text, sql).Tables[0];
+
+            return dt;
+        }
+
+        #endregion
     }
 }

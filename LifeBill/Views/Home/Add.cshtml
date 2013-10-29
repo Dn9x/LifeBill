@@ -67,9 +67,30 @@
         });
 
         $("#notes").blur(function () {
-            var val = $(this).val().replace(/,/g, ";");
+            var val = $(this).val().replace(/,/g, ";").replace(/；/g, ";").replace(/，/g, ";").replace(/:/g, "：");
 
             $(this).val(val);
+
+            var s = val;
+            var reg = /[+-]?\d+\.?\d*/g;
+            var sum = 0.0;
+            var expr;
+            var numbers = s.match(reg);
+            if (numbers != null) {
+                for (v in numbers) {
+                    if (v == 0)
+                        expr = numbers[v];
+                    else
+                        expr += '+' + numbers[v];
+
+                    sum += parseFloat(numbers[v]);
+                }
+            }
+
+            $(this).parent().prev().children().val(sum);
+
+            //            alert(expr + '=' + sum);
+            //            console.log(expr + '=' + sum);
         });
 
         $(".Add").click(function () {

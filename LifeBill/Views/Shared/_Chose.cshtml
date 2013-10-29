@@ -1,0 +1,100 @@
+﻿
+<fieldset id="Chose_Field">
+    <legend id="Leg">条件：</legend>
+    <table>
+        <tr>
+            <td align="right">年</td>
+            <td>
+                <a rel="2013" class="chose_year">2013</a>&nbsp;&nbsp;<a rel="2014" class="chose_year">2014</a>
+            </td>
+        </tr>
+        <tr>
+            <td align="right">月</td>
+            <td>
+                <a rel="1" class="chose_month">1</a>&nbsp;&nbsp;<a rel="2" class="chose_month">2</a>&nbsp;&nbsp;
+                <a rel="3" class="chose_month">3</a>&nbsp;&nbsp;<a rel="4" class="chose_month">4</a>&nbsp;&nbsp;
+                <a rel="5" class="chose_month">5</a>&nbsp;&nbsp;<a rel="6" class="chose_month">6</a>&nbsp;&nbsp;
+                <a rel="7" class="chose_month">7</a>&nbsp;&nbsp;<a rel="8" class="chose_month">8</a>&nbsp;&nbsp;
+                <a rel="9" class="chose_month">9</a>&nbsp;&nbsp;<a rel="10" class="chose_month">10</a>&nbsp;&nbsp;
+                <a rel="11" class="chose_month">11</a>&nbsp;&nbsp;<a rel="12" class="chose_month">12</a>
+            </td>
+        </tr>
+        <tr>
+            <td align="right">类型</td>
+            <td>
+                <a rel="line" class="chose_type">折线</a>&nbsp;&nbsp;<a rel="column" class="chose_type">柱形</a>&nbsp;&nbsp;<a rel="pie" class="chose_type">圆饼</a>
+            </td>
+        </tr>
+        <tr>
+            <td align="right">已选条件</td>
+            <td id="td_res">
+            <a id="res_year">2013</a>&nbsp;&nbsp;<a id="res_month">10</a>&nbsp;&nbsp;<a id="res_type">柱形</a>
+            <input type="hidden" id="Hid_Year" name="year" />
+            <input type="hidden" id="Hid_Month" name="month" />
+            <input type="hidden" id="Hid_Type" name="type" />
+            </td>
+        </tr>
+    </table>
+</fieldset>
+
+<script src="@Url.Content("~/Scripts/highcharts.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        var year = "a[rel='" + (new Date().getFullYear()) + "']";
+        $(year).addClass("chose_add_a");
+
+        var month = "a[rel='" + (new Date().getMonth() + 1) + "']";
+        $(month).addClass("chose_add_a");
+
+        $("a[rel='line']").addClass("chose_add_a");
+
+        $("#Hid_Year").val(new Date().getFullYear());
+        $("#Hid_Month").val(new Date().getMonth() + 1);
+        $("#Hid_Type").val("line");
+
+        //默认显示
+        ShowT();
+
+        //年
+        $(".chose_year").click(function () {
+            $(".chose_year").removeClass("chose_add_a");
+
+            $(this).addClass("chose_add_a");
+
+            $("#res_year").html($(this).attr("rel"));
+
+            $("#Hid_Year").val($(this).attr("rel"));
+
+            ShowT();
+        });
+
+        //月
+        $(".chose_month").click(function () {
+            $(".chose_month").removeClass("chose_add_a");
+
+            $(this).addClass("chose_add_a");
+
+            $("#res_month").html($(this).attr("rel"));
+
+            $("#Hid_Month").val($(this).attr("rel"));
+
+            ShowT();
+        });
+
+        //类型
+        $(".chose_type").click(function () {
+            $(".chose_type").removeClass("chose_add_a");
+
+            $(this).addClass("chose_add_a");
+
+            $("#res_type").html($(this).html());
+
+            $("#Hid_Type").val($(this).attr("rel"));
+
+            ShowT();
+        });
+
+    });
+</script>
+
+<script src="@Url.Content("~/Scripts/gray.js")" type="text/javascript"></script>

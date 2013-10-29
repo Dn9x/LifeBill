@@ -18,35 +18,6 @@ namespace LifeBill.Controllers
         [Authorize]
         public ActionResult Index()
         {
-            int year = DateTime.Now.Year;
-            int month = DateTime.Now.Month;
-            if (Request["y"] != null&& Request["m"] != null)
-            {
-                try
-                {
-                    year = Convert.ToInt32(Request["y"]);
-                    month = Convert.ToInt32(Request["m"]);
-                }
-                catch (Exception ex)
-                {
-                    year = DateTime.Now.Year;
-                    month = DateTime.Now.Month;
-                }
-            }
-
-            var str = GetCalendar(year, month, SetMap(year, month));
-
-            ViewBag.Message = str;
-
-            string u = "";
-            string d = "";
-
-            GetYaM(year, month, ref u, ref d);
-
-            ViewBag.Date = year + "/" + month;
-            ViewBag.Up = u;
-            ViewBag.Down = d;
-
             return View();
         }
 
@@ -118,24 +89,24 @@ namespace LifeBill.Controllers
             //获取入账的类型
             DataTable tags = iBill.SelectTagByType("I");
 
-            int revenue = 0;        //入账
-            int outlay = 0;         //出账
+            double revenue = 0;        //入账
+            double outlay = 0;         //出账
 
             for (int i = 0; i < type.Length; i++)
             {
-                int temp = 0;
+                double temp = 0;
 
                 for (int j = 0; j < tags.Rows.Count; j++)
                 {
                     if (type[i] == tags.Rows[j]["id"].ToString())
                     {
-                        revenue += Convert.ToInt32(price[i]);
+                        revenue += Convert.ToDouble(price[i]);
                         temp = 0;
                         break;
                     }
                     else
                     {
-                        temp = Convert.ToInt32(price[i]);
+                        temp = Convert.ToDouble(price[i]);
                     }
                 }
 
@@ -151,14 +122,14 @@ namespace LifeBill.Controllers
             for (int i = 0; i < type.Length; i++)
             {
                 sql = String.Format("insert into billdetail(masterid, tagid, price, notes, addtime) " +
-                                "values((select id from billmaster where years={0} and months={1} and days={2}), {3}, {4}, '{5}', now())", year, month, day, type[i], price[i], notes[i]);
+                                "values((select id from billmaster where years={0} and months={1} and days={2}), {3}, {4}, '{5}', now())", year, month, day, type[i], price[i], notes[i].Trim());
 
                 list.Add(sql);
             }
 
             iBill.InsertBill(list);
 
-            return RedirectToAction("About");
+            return RedirectToAction("Index");
         }
 
         [Authorize]
@@ -184,7 +155,7 @@ namespace LifeBill.Controllers
         [HttpPost]
         public ActionResult Upd(FormCollection form)
         {
-            int mid = Convert.ToInt32(Convert.ToInt32(form["id"])); 
+            int mid = Convert.ToInt32(Convert.ToDouble(form["id"])); 
             
             string[] type = form["type"].Split(',');
             string[] price = form["price"].Split(',');
@@ -197,24 +168,24 @@ namespace LifeBill.Controllers
             //获取入账的类型
             DataTable tags = iBill.SelectTagByType("I");
 
-            int revenue = 0;        //入账
-            int outlay = 0;         //出账
+            double revenue = 0;        //入账
+            double outlay = 0;         //出账
 
             for (int i = 0; i < type.Length; i++)
             {
-                int temp = 0;
+                double temp = 0;
 
                 for (int j = 0; j < tags.Rows.Count; j++)
                 {
                     if (type[i] == tags.Rows[j]["id"].ToString())
                     {
-                        revenue += Convert.ToInt32(price[i]);
+                        revenue += Convert.ToDouble(price[i]);
                         temp = 0;
                         break;
                     }
                     else
                     {
-                        temp = Convert.ToInt32(price[i]);
+                        temp = Convert.ToDouble(price[i]);
                     }
                 }
 
@@ -235,19 +206,63 @@ namespace LifeBill.Controllers
             for (int i = 0; i < type.Length; i++)
             {
                 sql = String.Format("insert into billdetail(masterid, tagid, price, notes, addtime) " +
-                                "values({0}, {1}, {2}, '{3}', now())", mid, type[i], price[i], notes[i]);
+                                "values({0}, {1}, {2}, '{3}', now())", mid, type[i], price[i], notes[i].Trim());
 
                 list.Add(sql);
             }
 
             iBill.InsertBill(list);
 
-            return RedirectToAction("About");
+            return RedirectToAction("Index");
         }
 
         public ActionResult About()
         {
             return View();
+        }
+
+        public ContentResult GetMap()
+        {
+            int year = Convert.ToInt32(Request["y"]);
+
+            int month = Convert.ToInt32(Request["m"]); 
+
+            string sql = String.Format("select id, concat('-', outlay) as outlay, revenue, days from billmaster where years={0} and months={1} group by years, months, days", year, month);
+
+            IBill iBill = new BillServices();
+
+            DataTable dt = iBill.SelectBillBySql(sql);
+
+            string res = "";
+
+            string r1 = "[";
+            string r2 = "{name: '出账', data: [";
+            string r3 = "{name: '进账', data: [";
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                if (i != dt.Rows.Count - 1)
+                {
+                    r1 += "'" + dt.Rows[i]["days"].ToString() + "', ";
+                    r2 += "" + dt.Rows[i]["outlay"].ToString() + ", ";
+                    r3 += "" + dt.Rows[i]["revenue"].ToString() + ", ";
+                }
+                else
+                {
+                    r1 += "'" + dt.Rows[i]["days"].ToString() + "'";
+                    r2 += "" + dt.Rows[i]["outlay"].ToString() + "";
+                    r3 += "" + dt.Rows[i]["revenue"].ToString() + "";
+                
+                }
+            }
+
+            r1 += "]";
+            r2 += "]}";
+            r3 += "]}";
+
+            res = r1 + "~*~" + r2 + "~*~" + r3;
+
+            return Content(res);
         }
 
         public ContentResult GetJson()
@@ -290,158 +305,6 @@ namespace LifeBill.Controllers
             }
 
             return json + "}";
-        }
-
-        private Hashtable SetMap(int year, int month)
-        {
-            Hashtable ht = new Hashtable();
-
-            IBill iBill = new BillServices();
-
-            DataTable dt = iBill.SelectMasterByDate(year, month);
-
-            if (dt.Rows.Count > 0)
-            {
-                for (int i = 0; i < dt.Rows.Count; i++)
-                {
-                    ht.Add(dt.Rows[i]["date"], dt.Rows[i]["total"]);
-                }
-            }
-
-            return ht;
-        }
-
-        private void GetYaM(int year, int month, ref string u, ref string d)
-        { 
-            if(month == 1)
-            {
-                u = "y=" + (year-1) + "&m=" + 12;
-                d = "y=" + year + "&m=" + (month+1);
-            }
-            else if (month == 12)
-            {
-                u = "y=" + year + "&m=" + (month - 1);
-                d = "y=" + (year + 1) + "&m=" + 1;
-            }
-            else
-            {
-                u = "y=" + year + "&m=" + (month - 1);
-                d = "y=" + year + "&m=" + (month + 1);
-            }
-        }
-
-        private string GetCalendar(int year, int month, Hashtable ht)
-        {
-            //获取当前天的时间对象
-            DateTime dtw = new DateTime(year, month, 1);
-
-            //获取当前月的第一条是礼拜几以数字表示
-            var week = dtw.DayOfWeek.GetHashCode() == 0 ? 7 : dtw.DayOfWeek.GetHashCode();
-
-            var cal = "<tr>";       //拼接日历
-
-            //1.1.判断前面空几个
-            int qg = week-1;
-
-            //1.2.获取前面空格上面的日期从那天开始：上个月天数-空格数+1
-            int qm = 0;
-            if (month == 1)
-            {
-                qm = DateTime.DaysInMonth(year-1, 12) - qg + 1;
-            }
-            else
-            {
-                qm = DateTime.DaysInMonth(year, month - 1) - qg + 1;
-            }
-
-            //1.3.循环添加前面的空格日期
-            for (int i = 0; i < qg; i++)
-            {
-                cal += "<td>" + 
-                        "<div class='td_div_main'>" +
-                        "<div class='td_div_topg'>" + (qm + i) + "</div>" + 
-                        "<div class='td_div_cont'>&nbsp;</div>" + 
-                        "</div>" + 
-                        "</td>";
-            }
-
-            //1.4.循环这一行里面剩下的几天
-            for (int i = 0; i < (7 - week + 1); i++)
-            {
-                cal += "<td>" +
-                        "<div class='td_div_main'>" +
-                        "<div class='td_div_top'>" + (1 + i) + "</div>" +
-                        "<div class='td_div_cont'>"+ht[year+""+month+""+(i+1)]+"</div>" +
-                        "</div>" +
-                        "</td>";
-            }
-
-            //1.5.第一行数据拼接完成
-            cal += "</tr>";
-
-            //2.1.计算本月有多少天
-            int dd = DateTime.DaysInMonth(year, month);
-
-            //2.2.计算还有多少天要循环
-            int sd = dd - (7 - week + 1);
-
-            //2.3.计算整行的循环还有多少行
-            int hd = sd / 7;
-
-            //累加余下的日期开始数
-            int lc = 7 - week + 1;
-
-            //2.5.开始循环整行的
-            for (int i = 0; i < hd; i++)
-            {
-                cal += "<tr>";
-
-                //2.5.1.开始循环整行里面的td
-                for (int j = 0; j < 7; j++)
-                {
-                    lc++;
-                    cal += "<td>" +
-                           "<div class='td_div_main'>" +
-                           "<div class='td_div_top'>" + lc + "</div>" +
-                           "<div class='td_div_cont'>" + ht[year + "" + month + "" + lc] + "</div>" +
-                           "</div>" +
-                           "</td>";
-                }
-
-                cal += "</tr>";
-            }
-
-            //3.1.计算整行之后还有多少天剩余要循环
-            int gd = sd % 7;
-
-            //3.2.循环剩余没有循环的td
-            cal += "<tr>";
-            for (int i = 0; i < gd; i++)
-            {
-                lc++;
-                cal += "<td>" +
-                       "<div class='td_div_main'>" +
-                       "<div class='td_div_top'>" + lc + "</div>" +
-                       "<div class='td_div_cont'>" + ht[year + "" + month + "" + lc] + "</div>" +
-                       "</div>" +
-                       "</td>";
-            }
-
-            //3.3.循环最后一行不够循环剩余的td个数
-            for (int i = 0; i < 7-gd; i++)
-            {
-                cal += "<td>" +
-                       "<div class='td_div_main'>" +
-                       "<div class='td_div_topg'>" + (i + 1) + "</div>" +
-                       "<div class='td_div_cont'>&nbsp;</div>" +
-                       "</div>" +
-                       "</td>";
-            }
-            cal += "</tr>";
-
-               // DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
-
-            return cal;
         }
 
     }
