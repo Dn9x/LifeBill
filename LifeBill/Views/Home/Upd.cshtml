@@ -15,7 +15,7 @@
                 <th>操作</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tbody_p">
 
             @{
                 DataTable dets = ViewBag.Details as DataTable;
@@ -88,6 +88,24 @@
             var val = $(this).val().replace(/,/g, ";");
 
             $(this).val(val);
+
+            var s = val;
+            var reg = /[+-]?\d+\.?\d*/g;
+            var sum = 0.0;
+            var expr;
+            var numbers = s.match(reg);
+            if (numbers != null) {
+                for (v in numbers) {
+                    if (v == 0)
+                        expr = numbers[v];
+                    else
+                        expr += '+' + numbers[v];
+
+                    sum += parseFloat(numbers[v]);
+                }
+            }
+
+            $(this).parent().prev().children().val(sum);
         });
 
         $(".Add").click(function () {
@@ -98,6 +116,21 @@
 
         $(".Sha").click(function () {
             $(this).parent().parent().remove();
+        });
+
+        //监控那些按键按下
+        $(this).keydown(function (e) {
+            var oEvent = window.event;
+            console.log(oEvent.keyCode);
+
+            //添加 && oEvent.shiftKey
+            if (oEvent.keyCode == 40 && oEvent.ctrlKey) {
+                //alert("你按下了ctrl+enter");
+                var tr = $("#tbody_p").children().first().clone();
+
+                $("tbody").append(tr);
+            }
+
         });
     });
 </script>

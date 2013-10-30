@@ -40,7 +40,15 @@ namespace LifeBill.Controllers
 
             if (dt.Rows.Count > 0)
             {
-                FormsAuthentication.SetAuthCookie(dt.Rows[0]["name"].ToString(), true);
+                string cook = Keys.USERID + ":" + dt.Rows[0]["id"].ToString() + ", " +
+                            Keys.LOGIN + ":" + dt.Rows[0]["login"].ToString() + ", " +
+                            Keys.NAME + ":" + dt.Rows[0]["name"].ToString() + ", " +
+                            Keys.TEL + ":" + dt.Rows[0]["tel"].ToString() + ", " +
+                            Keys.EMAIL + ":" + dt.Rows[0]["email"].ToString() + ", " +
+                            Keys.SEX + ":" + dt.Rows[0]["sex"].ToString() + ", " +
+                            Keys.ADDTIME + ":" + dt.Rows[0]["addtime"].ToString();
+
+                FormsAuthentication.SetAuthCookie(cook, true);
                 
                 return RedirectToAction("Index", "Home");
             }
@@ -219,6 +227,47 @@ namespace LifeBill.Controllers
         public ActionResult About()
         {
             return View();
+        }
+
+        public ActionResult Tagchart()
+        {
+            return View();
+        }
+
+        public ContentResult GetTagchart()
+        { 
+            int year = Convert.ToInt32(Request["y"]);
+
+            int month = Convert.ToInt32(Request["m"]);
+
+            string sql = String.Format("select t.tagname as tagname, sum(d.price) as price from billdetail d, billtags t where d.tagid=t.id and d.masterid in (select id from billmaster where years={0} and months={1}) and d.tagid not in (select id from billtags where tagtype='I') group by d.tagid", year, month);
+
+            IBill iBill = new BillServices();
+
+            DataTable dt = iBill.SelectBillBySql(sql);
+
+            string res = "";
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                if (i != dt.Rows.Count - 1)
+                {
+                    if(i == 1)
+                    {
+                        res += "{name: '" + dt.Rows[i]["tagname"].ToString() + "', y: " + dt.Rows[i]["price"].ToString() + ", sliced: true, selected: true}, ";
+                    }
+                    else
+                    {
+                        res += "['" + dt.Rows[i]["tagname"].ToString() + "', " + dt.Rows[i]["price"].ToString() + "], ";
+                    }
+                }
+                else
+                {
+                    res += "['" + dt.Rows[i]["tagname"].ToString() + "', " + dt.Rows[i]["price"].ToString() + "]";
+                }
+            }
+
+            return Content(res);
         }
 
         public ContentResult GetMap()

@@ -14,7 +14,7 @@
                 <th>操作</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="tbody_p">
             <tr>
                 <td align="center">
                     <select name="type">
@@ -102,5 +102,31 @@
         $(".Sha").click(function () {
             $(this).parent().parent().remove();
         });
+
+        //监控那些按键按下
+        $(this).keydown(function (e) {
+            var oEvent = window.event;
+            console.log(oEvent.keyCode);
+            
+            //添加 && oEvent.shiftKey
+            if (oEvent.keyCode == 40 && oEvent.ctrlKey) {
+                //alert("你按下了ctrl+enter");
+                var tr = $("#tbody_p").children().first().clone();
+
+                $("tbody").append(tr);
+            }
+
+            //删除
+            if (oEvent.keyCode == 38 && oEvent.ctrlKey) {
+                var $count = $("#tbody_p").children();
+
+                //至少保留一个
+                if ($count.length > 1) {
+                    $("#tbody_p").children().last().remove();
+                }
+            }
+        });
+
+
     });
 </script>

@@ -177,12 +177,26 @@ namespace LifeBill.Models.Util
             return res;
         }
 
-        //public static string[] SplitStr(string str, char chr)
-        //{
-        //    string[] res = str.Split(chr);
-
-        //    return res;
-        //}
+        /// <summary>
+        /// 读取存储在cookie中的user信息
+        /// </summary>
+        /// <param name="userInfo">User.Identity.Name</param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static string GetCookie(string userInfo, string key)
+        {
+            string result = null;
+            string[] Info = userInfo.Split(',');
+            foreach (string s in Info)
+            {
+                if (s.Trim().StartsWith(key))
+                {
+                    result = s.Substring(s.IndexOf(":", 0) + 1);
+                    break;
+                }
+            }
+            return result;
+        }
 
 
         

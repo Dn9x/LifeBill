@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = "Tagchart";
+}
+
+@Html.Partial("_Chose")
+
+<div id="container" style="min-width: 800px; height: 600px; margin: 0px auto"></div>
+
+<script type="text/javascript">
+
+    $(function () {
+        $(".chose_type").removeClass("chose_add_a");
+        $("a[rel='pie']").addClass("chose_add_a");
+        $("#res_type").html("圆饼");
+        $("#Hid_Type").val("pie");
+    });
+
+    function ShowT() {
+        $.post(
+			"/Home/GetTagchart",
+			{ "y": $("#Hid_Year").val(), "m": $("#Hid_Month").val() },
+			function (json, textStatus) {
+			    if (textStatus = "success") {
+			        var dats = "{type: '" + $("#Hid_Type").val() + "', name: '金额/百分比', data: [" + json + "]}";
+
+			        $('#container').highcharts({
+			            chart: {
+			                plotBackgroundColor: null,
+			                plotBorderWidth: null,
+			                plotShadow: false
+			            },
+			            title: {
+			                text: $("#Hid_Year").val() + "/" + $("#Hid_Month").val() + '各类消费账单信息：'
+			            },
+			            tooltip: {
+			                pointFormat: '{series.name}: <b>{point.y}/{point.percentage:.1f}%</b>'
+			            },
+			            plotOptions: {
+			                pie: {
+			                    allowPointSelect: true,
+			                    cursor: 'pointer',
+			                    dataLabels: {
+			                        enabled: true,
+			                        color: '#FFFFFF',
+			                        connectorColor: '#FFFFFF',
+			                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+			                    }
+			                }
+			            },
+			            series: [eval('(' + dats + ')')]
+			        });
+			    }
+			}
+		 );
+    }
+</script>
