@@ -1,0 +1,184 @@
+﻿
+<fieldset id="Chose_Field">
+    <legend id="Leg">条件：</legend>
+    <table>
+        <tr>
+            <td align="right">年</td>
+            <td>
+                <a rel="2013" class="chose_year">2013</a>&nbsp;&nbsp;<a rel="2014" class="chose_year">2014</a>
+            </td>
+        </tr>
+        <tr>
+            <td align="right">分类</td>
+            <td>
+                <a rel="week" class="chose_tags">按周</a>&nbsp;&nbsp;
+                <a rel="month" class="chose_tags">按月</a>&nbsp;&nbsp;
+                <a rel="quarter" class="chose_tags">按季度</a>&nbsp;&nbsp;
+            </td>
+        </tr>
+        <tr id="Tr_Tags">
+            <td align="right">周</td>
+            <td>
+                <a rel="0" class="chose_tags_num chose_add_a">不限</a>
+                @{
+                    for (int i = 1; i < 53;i++ )
+                    {
+                        if(i==22 || i==41){
+                        <a rel="@i" class="chose_tags_num">@i</a><br />
+                        }else{
+                        <a rel="@i" class="chose_tags_num">@i</a>
+                        }
+                    }
+                }
+            </td>
+        </tr>
+        <tr>
+            <td align="right">类型</td>
+            <td>
+                <a rel="line" class="chose_type">折线</a>&nbsp;&nbsp;<a rel="column" class="chose_type">柱形</a>&nbsp;&nbsp;<a rel="pie" class="chose_type">圆饼</a>
+            </td>
+        </tr>
+        <tr>
+            <td align="right">已选条件</td>
+            <td id="td_res">
+            <a id="res_year">2013</a>&nbsp;&nbsp;
+            <a id="res_tags">按周</a>&nbsp;&nbsp;
+            <a id="res_tags_num">不限</a>&nbsp;&nbsp;
+            <a id="res_type">圆饼</a>
+            <input type="hidden" id="Hid_Year" name="year" />
+            <input type="hidden" id="Hid_Tags" name="Tags" />
+            <input type="hidden" id="Hid_Tags_Num" name="Tags_Num" />
+            <input type="hidden" id="Hid_Type" name="type" />
+            </td>
+        </tr>
+    </table>
+</fieldset>
+
+<script src="@Url.Content("~/Scripts/highcharts.js")" type="text/javascript"></script>
+<script type="text/javascript">
+    $(function () {
+        var year = "a[rel='" + (new Date().getFullYear()) + "']";
+        $(year).addClass("chose_add_a");
+
+        $("a[rel='week']").addClass("chose_add_a");
+        $("a[rel='pie']").addClass("chose_add_a");
+
+        $("#Hid_Year").val(new Date().getFullYear());
+        $("#Hid_Tags").val("week");
+        $("#Hid_Tags_Num").val("0");
+        $("#Hid_Type").val("pie");
+
+        //默认显示
+        ShowT();
+
+        //年
+        $(".chose_year").click(function () {
+            $(".chose_year").removeClass("chose_add_a");
+
+            $(this).addClass("chose_add_a");
+
+            $("#res_year").html($(this).attr("rel"));
+
+            $("#Hid_Year").val($(this).attr("rel"));
+
+            ShowT();
+        });
+
+        //分类
+        $(".chose_tags").click(function () {
+            $(".chose_tags").removeClass("chose_add_a");
+            $(this).addClass("chose_add_a");
+
+            //判断方便生成下面的数据
+            if ($(this).attr("rel") == "week") {
+                var tr = "<td align='right'>周</td>" +
+                         "<td>" +
+                         "<a rel='0' onclick='ChoseTagsNum(this)' class='chose_tags_num chose_add_a'>不限</a>";
+
+                for (var i = 1; i < 53; i++) {
+                    if (i == 22 || i == 41) {
+                        tr += "<a rel='" + i + "' onclick='ChoseTagsNum(this)' class='chose_tags_num'>" + i + "</a><br />";
+                    } else {
+                        tr += "<a rel='" + i + "' onclick='ChoseTagsNum(this)' class='chose_tags_num'>" + i + "</a>";
+                    }
+                }
+
+                tr += "</td>";
+
+                $("#Tr_Tags").html("").html(tr);
+            } else if ($(this).attr("rel") == "month") {
+                var tr = "<td align='right'>月</td>" +
+                         "<td>" +
+                         "<a rel='0' onclick='ChoseTagsNum(this)' class='chose_tags_num chose_add_a'>不限</a>";
+
+                for (var i = 1; i < 13; i++) {
+                    tr += "<a rel='" + i + "' onclick='ChoseTagsNum(this)' class='chose_tags_num'>" + i + "</a>";
+                }
+
+                tr += "</td>";
+
+                $("#Tr_Tags").html("").html(tr);
+            } else if ($(this).attr("rel") == "quarter") {
+                var tr = "<td align='right'>季度</td>" +
+                         "<td>" +
+                         "<a rel='0' onclick='ChoseTagsNum(this)' class='chose_tags_num chose_add_a'>不限</a>";
+
+                for (var i = 1; i < 5; i++) {
+                    tr += "<a rel='" + i + "' onclick='ChoseTagsNum(this)' class='chose_tags_num'>" + i + "</a>";
+                }
+
+                tr += "</td>";
+
+                $("#Tr_Tags").html("").html(tr);
+            }
+
+            $("#res_tags").html($(this).text());
+            $("#Hid_Tags").val($(this).attr("rel"));
+            $("#res_tags_num").html("不限");
+            $("#Hid_Tags_Num").val("0");
+
+            ShowT();
+        });
+
+        $(".chose_tags_num").click(function () {
+            $(".chose_tags_num").removeClass("chose_add_a");
+
+            $(this).addClass("chose_add_a");
+
+            $("#res_tags_num").html($(this).html());
+
+            $("#Hid_Tags_Num").val($(this).attr("rel"));
+
+            ShowT();
+        });
+
+        //类型
+        $(".chose_type").click(function () {
+            $(".chose_type").removeClass("chose_add_a");
+
+            $(this).addClass("chose_add_a");
+
+            $("#res_type").html($(this).html());
+
+            $("#Hid_Type").val($(this).attr("rel"));
+
+            ShowT();
+        });
+
+    });
+
+    function ChoseTagsNum(op){
+        $(".chose_tags_num").removeClass("chose_add_a");
+
+        $(op).addClass("chose_add_a");
+
+        $("#res_tags_num").html($(op).html());
+
+        $("#Hid_Tags_Num").val($(op).attr("rel"));
+
+        ShowT();
+    }
+</script>
+
+<script src="@Url.Content("~/Scripts/gray.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/exporting.js")" type="text/javascript"></script>

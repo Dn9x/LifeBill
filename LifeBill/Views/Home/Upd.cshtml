@@ -84,7 +84,7 @@
             }
         });
 
-        $("#notes").blur(function () {
+        $("textarea[name='notes']").blur(function () {
             var val = $(this).val().replace(/,/g, ";");
 
             $(this).val(val);
@@ -126,7 +126,7 @@
             //添加 && oEvent.shiftKey
             if (oEvent.keyCode == 40 && oEvent.ctrlKey) {
                 //alert("你按下了ctrl+enter");
-                var tr = $("#tbody_p").children().first().clone();
+                var tr = $("#tbody_p").children().first().clone(true);
 
                 $("tbody").append(tr);
             }

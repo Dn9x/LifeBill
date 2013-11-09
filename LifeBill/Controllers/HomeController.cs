@@ -234,6 +234,89 @@ namespace LifeBill.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 按季度查询
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Quarter() {
+            return View();
+        }
+
+        public ContentResult GetQuarter() {
+            int year = Convert.ToInt32(Request["y"]);
+            string type = Request["t"];
+            string num = Request["n"];
+
+            string sql = "";
+
+            if (type == "week")
+            {
+                if (num == "0")
+                {
+                    sql += String.Format("SELECT sum(outlay) as price, week(concat(years, '-', months, '-', days))+1 as names FROM billmaster where years={0} group by names", year);
+                }
+                else 
+                {
+                    sql += String.Format("select t.tagname as names, sum(d.price) as price from billdetail d, billtags t where d.tagid = t.id " +
+                                "and d.masterid in (SELECT id FROM billmaster where years={0} and week(concat(years, '-', months, '-', days))+1 = {1} ) and t.tagtype = 'O' " +
+                                "group by t.tagname", year, num);
+                }
+            }
+            else if (type == "month")
+            {
+                if (num == "0")
+                {
+                    sql += String.Format("SELECT sum(outlay) as price, month(concat(years, '-', months, '-', days)) as names FROM billmaster where years={0} group by names", year);
+                }
+                else
+                {
+                    sql += String.Format("select t.tagname as names, sum(d.price) as price from billdetail d, billtags t where d.tagid = t.id " +
+                                "and d.masterid in (SELECT id FROM billmaster where years={0} and month(concat(years, '-', months, '-', days)) = {1} ) and t.tagtype = 'O' " +
+                                "group by t.tagname", year, num);
+                }
+            }
+            else if (type == "quarter") 
+            {
+                if (num == "0")
+                {
+                    sql += String.Format("SELECT sum(outlay) as price, quarter(concat(years, '-', months, '-', days)) as names FROM billmaster where years={0} group by names", year);
+                }
+                else
+                {
+                    sql += String.Format("select t.tagname as names, sum(d.price) as price from billdetail d, billtags t where d.tagid = t.id " +
+                                "and d.masterid in (SELECT id FROM billmaster where years={0} and quarter(concat(years, '-', months, '-', days)) = {1} ) and t.tagtype = 'O' " +
+                                "group by t.tagname", year, num);
+                }
+            }
+
+            IBill iBill = new BillServices();
+
+            DataTable dt = iBill.SelectBillBySql(sql);
+
+            string res = "";
+
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                if (i != dt.Rows.Count - 1)
+                {
+                    if (i == 1)
+                    {
+                        res += "{name: '" + dt.Rows[i]["names"].ToString() + "', y: " + dt.Rows[i]["price"].ToString() + ", sliced: true, selected: true}, ";
+                    }
+                    else
+                    {
+                        res += "['" + dt.Rows[i]["names"].ToString() + "', " + dt.Rows[i]["price"].ToString() + "], ";
+                    }
+                }
+                else
+                {
+                    res += "['" + dt.Rows[i]["names"].ToString() + "', " + dt.Rows[i]["price"].ToString() + "]";
+                }
+            }
+
+            return Content(res);
+        }
+
         public ContentResult GetTagchart()
         { 
             int year = Convert.ToInt32(Request["y"]);
